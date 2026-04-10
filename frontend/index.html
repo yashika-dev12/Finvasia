@@ -1,1 +1,285 @@
-<h1>My Finance App</h1>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.dash{display:grid;grid-template-columns:56px 1fr 280px;min-height:100vh;background:#0f0e1a;color:#e2e0ff}
+.sidebar{background:#130f2a;display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:20px;border-right:1px solid #2a2550}
+.s-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px}
+.s-icon.active{background:#4e3bbf}
+.main{display:flex;flex-direction:column;gap:14px;padding:16px;overflow:hidden}
+.right{display:flex;flex-direction:column;gap:14px;padding:16px;border-left:1px solid #2a2550}
+.card{background:#1a1632;border-radius:14px;padding:14px 18px;border:1px solid #2a2550}
+.top-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.metric-label{font-size:11px;color:#9893c0;margin-bottom:4px}
+.metric-val{font-size:22px;font-weight:600;color:#e8e5ff}
+.badge-green{font-size:11px;color:#4ecca3;background:#0d3326;padding:2px 8px;border-radius:20px;display:inline-block;margin-top:4px}
+.credit-inner{display:flex;align-items:center;gap:16px}
+.ring-wrap{position:relative;width:64px;height:64px}
+.ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#e8e5ff}
+.goal-bar-bg{background:#2a2550;border-radius:4px;height:6px;margin-top:8px}
+.goal-bar{background:linear-gradient(90deg,#7c5af5,#5bc8f5);height:6px;border-radius:4px;width:35%}
+.goal-pct{font-size:20px;font-weight:600;color:#7c5af5}
+.section-title{font-size:13px;font-weight:600;color:#c8c2f0;margin-bottom:10px}
+.investment-row{display:flex;align-items:center;gap:6px;margin-bottom:12px}
+.amt-purple{font-size:20px;font-weight:700;color:#9a82fc}
+.amt-green{font-size:20px;font-weight:700;color:#4ecca3}
+.arrow-icon{color:#9a82fc;font-size:18px}
+.chart-wrap{position:relative;width:100%;height:160px}
+.cat-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #2a2550}
+.cat-name{font-size:13px;color:#c8c2f0}
+.cat-amt{font-size:13px;font-weight:600;color:#e8e5ff}
+.cat-pct{font-size:12px;padding:2px 8px;border-radius:20px}
+.pct-green{background:#0d3326;color:#4ecca3}
+.pct-yellow{background:#2d2700;color:#f5d65b}
+.pct-orange{background:#2d1600;color:#f5954b}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot-green{background:#4ecca3}
+.dot-yellow{background:#f5d65b}
+.dot-orange{background:#f5954b}
+.tracker-section{margin-top:4px}
+.input-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.inp{background:#0f0e1a;border:1px solid #3a3565;border-radius:8px;color:#e8e5ff;padding:7px 10px;font-size:13px;outline:none;width:90px}
+.sel{background:#0f0e1a;border:1px solid #3a3565;border-radius:8px;color:#e8e5ff;padding:7px 10px;font-size:13px;outline:none}
+.btn-add{background:#5a3fde;border:none;color:#fff;padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer}
+.risk-tabs{display:flex;gap:6px;margin-bottom:8px}
+.rtab{padding:5px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid #3a3565;color:#9893c0;background:transparent}
+.rtab.active{background:#5a3fde;color:#fff;border-color:#5a3fde}
+.tracker-list{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.trow{display:flex;justify-content:space-between;padding:6px 10px;background:#0f0e1a;border-radius:8px;font-size:13px}
+.tcat{color:#9893c0}
+.tamt{color:#e8e5ff;font-weight:600}
+.total-spent{font-size:12px;color:#9893c0;margin-bottom:6px}
+.alert-card{background:#1a1632;border-radius:12px;padding:12px 14px;border:1px solid #2a2550;font-size:13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.alert-icon{font-size:16px;margin-top:1px}
+.alert-text{color:#c8c2f0;line-height:1.4}
+.alert-text strong{color:#e8e5ff}
+.right-title{font-size:12px;font-weight:600;color:#9893c0;margin-bottom:8px;letter-spacing:.5px}
+.rec-card{background:#1a1632;border-radius:12px;padding:14px;border:1px solid #2a2550;margin-bottom:8px}
+.rec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.rec-label{font-size:11px;color:#9893c0}
+.rec-amount{font-size:22px;font-weight:700;color:#e8e5ff}
+.learn-btn{display:block;text-align:center;padding:7px;border:1px solid #3a3565;border-radius:8px;color:#9893c0;font-size:12px;margin-top:8px;cursor:pointer}
+.ai-card{background:#1a1632;border-radius:12px;padding:14px;border:1px solid #2a2550;margin-bottom:8px}
+.ai-input-row{display:flex;gap:6px;margin:10px 0 8px}
+.ai-inp{flex:1;background:#0f0e1a;border:1px solid #3a3565;border-radius:8px;color:#e8e5ff;padding:7px 10px;font-size:12px;outline:none}
+.ai-ask{background:#5a3fde;border:none;color:#fff;padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer}
+.not-rec{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:13px;color:#f5954b}
+.budget-warn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:#2d1600;font-size:12px;color:#f5954b}
+.warn-icon{font-size:14px}
+.prog-bar-bg{background:#2a2550;border-radius:4px;height:6px;margin-top:4px}
+.prog-bar-fill{background:linear-gradient(90deg,#5a3fde,#4ecca3);height:6px;border-radius:4px}
+.inv-growth{display:flex;align-items:center;gap:8px}
+</style>
+
+<div class="dash">
+  <div class="sidebar">
+    <div class="s-icon active">🏠</div>
+    <div class="s-icon">🗒</div>
+    <div class="s-icon">👥</div>
+    <div class="s-icon">📄</div>
+  </div>
+
+  <div class="main">
+    <div style="display:flex;align-items:center;gap:8px;padding-bottom:4px">
+      <span style="font-size:18px">💰</span>
+      <span style="font-size:18px;font-weight:700;color:#e8e5ff">FinTrack</span>
+    </div>
+
+    <div class="top-row">
+      <div class="card">
+        <div class="metric-label">Total Balance</div>
+        <div class="metric-val">₹20,500</div>
+        <span class="badge-green">+12% this month</span>
+      </div>
+      <div class="card credit-inner">
+        <div>
+          <div class="metric-label">Credit Score</div>
+          <div class="metric-val" style="font-size:18px">720</div>
+        </div>
+        <div class="ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#2a2550" stroke-width="6"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="url(#ringGrad)" stroke-width="6" stroke-dasharray="113" stroke-dashoffset="28" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5bc8f5"/><stop offset="100%" stop-color="#7c5af5"/></linearGradient></defs>
+          </svg>
+          <div class="ring-val">720</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Goal Progress</div>
+        <div style="display:flex;align-items:baseline;gap:6px;margin:4px 0">
+          <span class="goal-pct">35%</span>
+          <span style="font-size:12px;color:#9893c0">completed</span>
+        </div>
+        <div class="goal-bar-bg"><div class="goal-bar"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div>
+          <div class="section-title" style="margin-bottom:4px">Investment Growth</div>
+          <div class="inv-growth">
+            <span class="amt-purple">₹1000</span>
+            <span class="arrow-icon">→</span>
+            <span class="amt-green">₹1150</span>
+          </div>
+        </div>
+        <span style="color:#5a3565;font-size:18px;cursor:pointer">⋯</span>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:#c8c2f0;margin-bottom:8px">Overview</div>
+      <div class="chart-wrap">
+        <canvas id="growthChart" role="img" aria-label="Investment growth line chart from January to June">Monthly investment growth trend.</canvas>
+      </div>
+      <div style="margin-top:14px">
+        <div class="section-title">Category-wise Breakdown</div>
+        <div class="cat-row">
+          <span style="display:flex;align-items:center;gap:6px"><span class="dot dot-green"></span><span class="cat-name">Food</span></span>
+          <span style="display:flex;align-items:center;gap:12px"><span class="cat-amt">₹12,000</span><span class="cat-pct pct-green">20%</span></span>
+        </div>
+        <div class="cat-row">
+          <span style="display:flex;align-items:center;gap:6px"><span class="dot dot-yellow"></span><span class="cat-name">Travel</span></span>
+          <span style="display:flex;align-items:center;gap:12px"><span class="cat-amt">₹7,000</span><span class="cat-pct pct-yellow">73%</span></span>
+        </div>
+        <div class="cat-row" style="border-bottom:none">
+          <span style="display:flex;align-items:center;gap:6px"><span class="dot dot-orange"></span><span class="cat-name">Shopping</span></span>
+          <span style="display:flex;align-items:center;gap:12px"><span class="cat-amt">₹5,500</span><span class="cat-pct pct-orange">54%</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card tracker-section">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+        <span style="font-size:16px">💰</span>
+        <span class="section-title" style="margin:0">Smart Expense Tracker</span>
+      </div>
+      <div class="input-row">
+        <span style="color:#9893c0;font-size:14px">₹</span>
+        <input class="inp" id="expAmt" type="number" value="500" placeholder="Amount">
+        <select class="sel" id="expCat">
+          <option>Food</option><option>Travel</option><option>Shopping</option><option>Other</option>
+        </select>
+        <button class="btn-add" onclick="addExpense()">Add</button>
+      </div>
+      <div class="total-spent" id="totalSpent">Total Spent: ₹19,000</div>
+      <div class="tracker-list" id="trackerList">
+        <div class="trow"><span class="tcat">Food</span><span class="tamt">₹12,000</span></div>
+        <div class="trow"><span class="tcat">Travel</span><span class="tamt">₹7,000</span></div>
+        <div class="trow"><span class="tcat">Shopping</span><span class="tamt">₹5,500</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="right-title">SMART ALERTS</div>
+    <div class="alert-card">
+      <span class="alert-icon">⚠️</span>
+      <span class="alert-text">You crossed your <strong>₹15,000</strong> monthly budget.</span>
+    </div>
+    <div class="alert-card">
+      <span class="alert-icon">🔥</span>
+      <span class="alert-text">You saved <strong>more</strong> than last week!</span>
+    </div>
+
+    <div class="right-title" style="margin-top:6px">SMART ALERTS</div>
+    <div class="rec-card">
+      <div class="rec-header">
+        <div>
+          <div class="rec-label">Ro ₹1001 Wex</div>
+          <div class="rec-amount">₹ 15,000</div>
+        </div>
+      </div>
+      <div class="risk-tabs">
+        <div class="rtab active">Safe</div>
+        <div class="rtab">Medium</div>
+        <div class="rtab">Risky</div>
+      </div>
+      <div style="font-size:12px;color:#9893c0">Your <span style="color:#9a82fc;font-weight:600">₹1000</span> → <span style="color:#4ecca3;font-weight:600">₹1150</span></div>
+      <div class="prog-bar-bg" style="margin-top:8px"><div class="prog-bar-fill" style="width:35%"></div></div>
+      <div style="text-align:right;font-size:12px;color:#4ecca3;margin-top:4px">35%</div>
+      <div class="learn-btn">Learn more</div>
+    </div>
+
+    <div class="right-title" style="margin-top:2px">AI ADVISOR</div>
+    <div class="ai-card">
+      <div style="font-size:12px;color:#9893c0">Should I invest it a new opportunity?</div>
+      <div class="ai-input-row">
+        <input class="ai-inp" id="aiQ" placeholder="Ask anything..." />
+        <button class="ai-ask" onclick="askAI()">Ask</button>
+      </div>
+      <div class="not-rec" id="aiAnswer">
+        <span>❌</span><span>Not recommended</span>
+      </div>
+    </div>
+
+    <div class="budget-warn">
+      <span class="warn-icon">⚠️</span>
+      <span>You crossed budget</span>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const expenses = {Food:12000,Travel:7000,Shopping:5500};
+
+new Chart(document.getElementById('growthChart'),{
+  type:'line',
+  data:{
+    labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets:[{
+      data:[2000,3000,4500,5500,9500,8500],
+      borderColor:'#7c5af5',
+      backgroundColor:'rgba(124,90,245,0.15)',
+      fill:true,
+      tension:0.4,
+      pointBackgroundColor:'#7c5af5',
+      pointRadius:4,
+      borderWidth:2
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e6a90',font:{size:11}}},
+      y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e6a90',font:{size:11},callback:v=>'₹'+Math.round(v/1000)+'k'},min:0,max:12000}
+    }
+  }
+});
+
+document.querySelectorAll('.rtab').forEach(t=>{
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.rtab').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+function updateList(){
+  const list=document.getElementById('trackerList');
+  list.innerHTML=Object.entries(expenses).map(([k,v])=>`<div class="trow"><span class="tcat">${k}</span><span class="tamt">₹${v.toLocaleString('en-IN')}</span></div>`).join('');
+  const total=Object.values(expenses).reduce((a,b)=>a+b,0);
+  document.getElementById('totalSpent').textContent='Total Spent: ₹'+total.toLocaleString('en-IN');
+}
+
+function addExpense(){
+  const amt=parseInt(document.getElementById('expAmt').value)||0;
+  const cat=document.getElementById('expCat').value;
+  if(amt>0){expenses[cat]=(expenses[cat]||0)+amt;updateList();}
+}
+
+function askAI(){
+  const q=document.getElementById('aiQ').value.trim();
+  if(!q)return;
+  const ans=document.getElementById('aiAnswer');
+  ans.innerHTML='<span>⏳</span><span style="color:#9893c0">Thinking...</span>';
+  setTimeout(()=>{
+    const lower=q.toLowerCase();
+    const positive=lower.includes('save')||lower.includes('fixed')||lower.includes('bond')||lower.includes('fd');
+    if(positive){ans.innerHTML='<span>✅</span><span style="color:#4ecca3">Recommended — low risk option</span>';}
+    else{ans.innerHTML='<span>❌</span><span style="color:#f5954b">Not recommended — review risk</span>';}
+  },800);
+  document.getElementById('aiQ').value='';
+}
+</script>
