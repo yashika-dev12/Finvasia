@@ -273,7 +273,6 @@ function updateList(){
   const total=Object.values(expenses).reduce((a,b)=>a+b,0);
   document.getElementById('totalSpent').textContent='Total Spent: ₹'+total.toLocaleString('en-IN');
 }
-
 function addExpense(){
   const amt=parseInt(document.getElementById('expAmt').value)||0;
   const cat=document.getElementById('expCat').value;
@@ -368,5 +367,52 @@ async function addExpense() {
 }
 
 // Start the app
-window.onload = initDashboard;
+// window.onload = initDashboard;
 </script>
+
+
+<script>
+async function addExpense() {
+  const data = {
+    title: "Food",
+    amount: 500,
+    category: "Food"
+  };
+
+  const res = await fetch("http://localhost:5000/api/expense", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+  alert(result.message);
+
+  // await fetch(...);
+
+alert(result.message);
+
+loadExpenses(); // 👈 ADD THIS
+}
+
+async function loadExpenses() {
+  const res = await fetch("http://localhost:5000/api/expense");
+  const data = await res.json();
+
+  const list = document.getElementById('trackerList');
+
+  list.innerHTML = data.map(e => `
+    <div class="trow">
+      <span class="tcat">${e.category}</span>
+      <span class="tamt">₹${e.amount}</span>
+    </div>
+  `).join('');
+}
+
+
+window.onload = loadExpenses;
+</script>
+
+
