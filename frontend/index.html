@@ -69,24 +69,13 @@ body{font-family:var(--font-sans)}
 .prog-bar-bg{background:#2a2550;border-radius:4px;height:6px;margin-top:4px}
 .prog-bar-fill{background:linear-gradient(90deg,#5a3fde,#4ecca3);height:6px;border-radius:4px}
 .inv-growth{display:flex;align-items:center;gap:8px}
-  @media (max-width: 768px) {
-    .dash {
-        grid-template-columns: 1fr; /* Stack everything vertically */
-    }
-    .sidebar {
-        display: none; /* Hide sidebar on mobile or move to bottom */
-    }
-    .top-row {
-        grid-template-columns: 1fr; /* Stack balance/credit cards */
-    }
-}
 </style>
 
 <div class="dash">
   <div class="sidebar">
     <a href="index.html" class="s-icon active" title="Home">🏠</a>
-    <a href="#" class="s-icon" title="Reports">🗒</a>
-    <a href="#" class="s-icon" title="Team">👥</a>
+    <a href="groups.html" class="s-icon" title="Reports">🗒</a>
+    <a href="reports.html" class="s-icon" title="Team">👥</a>
     <a href="about.html" class="s-icon" title="About">📄</a>
   </div>
 
@@ -323,50 +312,4 @@ function askAI(){
             }
         }, 1000);
     }
-</script>
-
-<script>
-
-  const API_URL = "http://localhost:5000/api";
-
-// 🔄 Load Dashboard Data from Backend
-async function initDashboard() {
-    try {
-        const res = await fetch(`${API_URL}/dashboard`);
-        const data = await res.json();
-        
-        // Update the UI with real database values
-        document.getElementById('balanceText').innerText = `₹${data.user.balance.toLocaleString('en-IN')}`;
-        document.getElementById('creditScoreText').innerText = data.user.creditScore;
-        document.getElementById('goalPctText').innerText = `${data.goalPct}%`;
-        document.querySelector('.goal-bar').style.width = `${data.goalPct}%`;
-        
-        // Update Alerts
-        const alertBox = document.querySelector('.right'); // Or a specific alert container
-        // Logic to clear and append alerts from data.alerts...
-    } catch (err) {
-        console.error("Backend not running? ", err);
-    }
-}
-
-// 💸 Send Expense to Backend
-async function addExpense() {
-    const amt = document.getElementById('expAmt').value;
-    const cat = document.getElementById('expCat').value;
-
-    const res = await fetch(`${API_URL}/expense`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ amount: parseInt(amt), category: cat })
-    });
-    const data = await res.json();
-    
-    if(data.recommendation) {
-        alert("🛡️ Smart Suggestion: " + data.recommendation);
-    }
-    initDashboard(); // Refresh UI instantly
-}
-
-// Start the app
-window.onload = initDashboard;
 </script>
