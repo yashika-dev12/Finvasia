@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack – Budget Groups</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e1a;--surface:#1a1632;--surface2:#211d3a;--border:#2a2550;
+  --accent:#7c5af5;--accent2:#5bc8f5;--green:#4ecca3;--text:#e8e5ff;
+  --text-dim:#9893c0;--text-mid:#c8c2f0;--sidebar:#130f2a;--orange:#f5954b;--yellow:#f5d65b;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:grid;grid-template-columns:56px 1fr;overflow-x:hidden}
+.sidebar{background:var(--sidebar);display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:20px;border-right:1px solid var(--border);position:sticky;top:0;height:100vh;z-index:10}
+.s-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;text-decoration:none;transition:background .2s}
+.s-icon:hover{background:#2a2550}
+.s-icon.active{background:#4e3bbf}
+.page{padding:24px 28px;overflow-x:hidden}
+.glow-orb{pointer-events:none;position:fixed;border-radius:50%;z-index:0}
+.glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(124,90,245,0.1) 0%,transparent 70%);top:-100px;right:-80px}
+.glow-2{width:300px;height:300px;background:radial-gradient(circle,rgba(78,204,163,0.07) 0%,transparent 70%);bottom:10%;left:5%}
+.inner{position:relative;z-index:1}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.brand{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text)}
+.breadcrumb{font-size:12px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:var(--text-dim);text-decoration:none}
+.btn-primary{background:var(--accent);border:none;color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity .2s}
+.btn-primary:hover{opacity:.85}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-mid);padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:border-color .2s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+
+/* OVERVIEW STRIP */
+.overview-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.ov-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:transform .2s}
+.ov-card:hover{transform:translateY(-2px)}
+.ov-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.ov-card:nth-child(1)::before{background:linear-gradient(90deg,#7c5af5,#5bc8f5)}
+.ov-card:nth-child(2)::before{background:linear-gradient(90deg,#4ecca3,#5bc8f5)}
+.ov-card:nth-child(3)::before{background:linear-gradient(90deg,#f5954b,#f5d65b)}
+.ov-card:nth-child(4)::before{background:linear-gradient(90deg,#7c5af5,#4ecca3)}
+.ov-label{font-size:11px;color:var(--text-dim);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.ov-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.ov-icon{position:absolute;top:14px;right:14px;font-size:18px;opacity:.3}
+.ov-sub{font-size:12px;color:var(--text-dim)}
+
+/* TWO-COL LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:16px}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+
+/* MEMBER CARDS */
+.members-grid{display:flex;flex-direction:column;gap:10px}
+.member-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .2s,background .2s;position:relative}
+.member-card:hover{border-color:rgba(124,90,245,0.4);background:rgba(124,90,245,0.04)}
+.member-card.selected{border-color:var(--accent);background:rgba(124,90,245,0.08)}
+.member-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;font-weight:700;font-size:14px}
+.av-purple{background:rgba(124,90,245,0.2);border:2px solid rgba(124,90,245,0.4);color:#9a82fc}
+.av-teal{background:rgba(78,204,163,0.2);border:2px solid rgba(78,204,163,0.4);color:#4ecca3}
+.av-blue{background:rgba(91,200,245,0.2);border:2px solid rgba(91,200,245,0.4);color:var(--accent2)}
+.av-orange{background:rgba(245,149,75,0.2);border:2px solid rgba(245,149,75,0.4);color:var(--orange)}
+.member-name{font-size:14px;font-weight:600;color:var(--text)}
+.member-role{font-size:12px;color:var(--text-dim)}
+.member-meta{display:flex;align-items:center;gap:6px;margin-left:auto}
+.role-badge{font-size:10px;padding:3px 10px;border-radius:20px}
+.role-admin{background:rgba(124,90,245,0.15);color:#9a82fc;border:1px solid rgba(124,90,245,0.3)}
+.role-member{background:rgba(78,204,163,0.12);color:#4ecca3;border:1px solid rgba(78,204,163,0.3)}
+.role-limited{background:rgba(245,149,75,0.12);color:var(--orange);border:1px solid rgba(245,149,75,0.3)}
+.spend-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.spend-label{font-size:12px;color:var(--text-dim)}
+.spend-amt{font-size:13px;font-weight:600;color:var(--text)}
+.spend-pct{font-size:11px;color:var(--text-dim)}
+.bar-bg{background:var(--border);border-radius:4px;height:5px}
+.bar-fill{height:5px;border-radius:4px}
+
+/* BUDGET ALLOCATION */
+.alloc-list{display:flex;flex-direction:column;gap:12px}
+.alloc-item{background:var(--bg);border-radius:10px;padding:12px 14px;border:1px solid var(--border)}
+.alloc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.alloc-name{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+.alloc-right{text-align:right}
+.alloc-spent{font-size:13px;font-weight:600;color:var(--text)}
+.alloc-limit{font-size:11px;color:var(--text-dim)}
+.alloc-bar-bg{background:var(--border);border-radius:4px;height:6px}
+.alloc-bar-fill{height:6px;border-radius:4px;transition:width .6s ease}
+.warn-text{font-size:11px;color:var(--orange);margin-top:4px}
+
+/* ACTIVITY FEED */
+.activity-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto}
+.activity-list::-webkit-scrollbar{width:4px}
+.activity-list::-webkit-scrollbar-track{background:transparent}
+.activity-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.act-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)}
+.act-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.act-body{flex:1}
+.act-text{font-size:13px;color:var(--text-mid);line-height:1.4}
+.act-text strong{color:var(--text)}
+.act-time{font-size:11px;color:var(--text-dim);margin-top:2px}
+.act-amt{font-size:13px;font-weight:600;color:var(--orange);flex-shrink:0}
+
+/* PERMISSIONS */
+.perm-table{width:100%;border-collapse:collapse}
+.perm-table th{font-size:11px;color:var(--text-dim);text-align:left;padding:8px 10px;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.perm-table td{padding:10px;border-bottom:1px solid rgba(42,37,80,0.5);font-size:13px}
+.perm-table tr:last-child td{border-bottom:none}
+.toggle-wrap{display:flex;align-items:center;gap:6px}
+.toggle{width:36px;height:20px;border-radius:20px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s}
+.toggle.on::after{transform:translateX(16px)}
+
+/* INVITE */
+.invite-form{display:flex;gap:8px;margin-top:14px}
+.invite-inp{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif}
+.invite-inp::placeholder{color:var(--text-dim)}
+.invite-inp:focus{border-color:var(--accent)}
+.invite-sel{background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif;cursor:pointer}
+.pending-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.pending-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--border);font-size:13px}
+.pending-email{color:var(--text-mid)}
+.pending-badge{font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(245,214,91,0.12);color:var(--yellow)}
+.revoke-btn{font-size:12px;color:var(--text-dim);cursor:pointer;background:none;border:none;transition:color .2s}
+.revoke-btn:hover{color:var(--orange)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(10,9,20,0.82);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border:1px solid rgba(124,90,245,0.35);border-radius:20px;padding:30px;max-width:420px;width:90%;position:relative;transform:translateY(20px) scale(.97);transition:transform .25s;box-shadow:0 24px 80px rgba(0,0,0,0.5)}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
+.modal-close{position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);color:var(--text-dim);font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text-dim);margin-bottom:18px}
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--text-dim);margin-bottom:6px;display:block;letter-spacing:.3px}
+.form-inp{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif}
+.form-inp:focus{border-color:var(--accent)}
+.form-sel{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif;cursor:pointer}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:2000;background:var(--surface);border:1px solid var(--green);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);transform:translateY(80px);opacity:0;transition:transform .3s,opacity .3s;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+.section-title{font-size:11px;font-weight:600;letter-spacing:1.5px;color:var(--text-dim);text-transform:uppercase;margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<div class="glow-orb glow-1"></div>
+<div class="glow-orb glow-2"></div>
+
+<div class="sidebar">
+  <a href="index.html" class="s-icon" title="Home">🏠</a>
+  <a href="reports.html" class="s-icon" title="Reports">🗒</a>
+  <a href="groups.html" class="s-icon active" title="Groups">👥</a>
+  <a href="about.html" class="s-icon" title="About">📄</a>
+</div>
+
+<div class="page">
+<div class="inner">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:18px">💰</span>
+        <span class="brand">FinTrack</span>
+      </div>
+      <div class="breadcrumb">
+        <a href="index.html">Dashboard</a>
+        <span>›</span>
+        <span style="color:var(--text-mid)">Budget Groups</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn-ghost" onclick="showToast('Group report exported!')">📊 Export Report</button>
+      <button class="btn-primary" onclick="openAddModal()">+ Add Member</button>
+    </div>
+  </div>
+
+  <!-- OVERVIEW STRIP -->
+  <div class="overview-strip reveal">
+    <div class="ov-card">
+      <div class="ov-icon">👥</div>
+      <div class="ov-label">Total Members</div>
+      <div class="ov-val" id="totalMembers">4</div>
+      <div class="ov-sub">1 admin · 3 members</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-icon">💰</div>
+      <div class="ov-label">Group Budget</div>
+      <div class="ov-val">₹60,000</div>
+      <div class="ov-sub">Monthly allocation</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-icon">🛒</div>
+      <div class="ov-label">Total Spent</div>
+      <div class="ov-val">₹38,700</div>
+      <div class="ov-sub" style="color:var(--orange)">64.5% of budget used</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-icon">🏦</div>
+      <div class="ov-label">Remaining</div>
+      <div class="ov-val" style="color:var(--green)">₹21,300</div>
+      <div class="ov-sub">12 days left in June</div>
+    </div>
+  </div>
+
+  <!-- MEMBERS + BUDGET ALLOCATION -->
+  <div class="two-col reveal">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Members</div>
+        <span style="font-size:12px;color:var(--text-dim);cursor:pointer" onclick="showToast('Click a member to view details')">4 active</span>
+      </div>
+      <div class="members-grid" id="membersList">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Budget Allocation</div>
+        <span style="font-size:12px;color:var(--text-dim)">June 2025</span>
+      </div>
+      <div class="alloc-list" id="allocList">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY + PERMISSIONS -->
+  <div class="two-col reveal">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Activity Feed</div>
+        <span style="font-size:12px;color:var(--text-dim)">Live updates</span>
+      </div>
+      <div class="activity-list" id="activityList">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Permissions & Roles</div>
+        <table class="perm-table">
+          <thead>
+            <tr><th>Member</th><th>Add Expense</th><th>Export</th><th>Edit Budget</th></tr>
+          </thead>
+          <tbody id="permTable"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Invite to Group</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Invite family members, roommates, or dependents by email.</div>
+        <div class="invite-form">
+          <input class="invite-inp" id="inviteEmail" type="email" placeholder="email@example.com">
+          <select class="invite-sel" id="inviteRole">
+            <option value="member">Member</option>
+            <option value="limited">Limited</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button class="btn-primary" onclick="sendInvite()" style="white-space:nowrap">Send</button>
+        </div>
+        <div class="pending-list" id="pendingList">
+          <div class="pending-item">
+            <span class="pending-email">cousin@gmail.com</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="pending-badge">Pending</span>
+              <button class="revoke-btn" onclick="revokeInvite(this)">Revoke</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal()">✕</div>
+    <div class="modal-title">Add New Member</div>
+    <div class="modal-sub">Add a family member, dependent, or roommate to your budget group.</div>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input class="form-inp" id="newName" placeholder="e.g. Rohan Sharma">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Relationship</label>
+      <select class="form-sel" id="newRelation">
+        <option>Spouse</option><option>Child</option><option>Parent</option><option>Sibling</option><option>Roommate</option><option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Monthly Budget Limit (₹)</label>
+      <input class="form-inp" id="newBudget" type="number" placeholder="e.g. 8000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <select class="form-sel" id="newRole">
+        <option value="member">Member — can add & view expenses</option>
+        <option value="limited">Limited — view only</option>
+        <option value="admin">Admin — full access</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="addMember()">Add Member</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span>✅</span><span id="toastMsg"></span></div>
+
+<script>
+const members=[
+  {id:1,name:'Tanishqa',initials:'TA',role:'admin',relation:'Self',budget:20000,spent:12400,color:'av-purple'},
+  {id:2,name:'Ravi Sharma',initials:'RS',role:'member',relation:'Spouse',budget:15000,spent:9800,color:'av-teal'},
+  {id:3,name:'Aarav Sharma',initials:'AS',role:'limited',relation:'Child',budget:5000,spent:2100,color:'av-blue'},
+  {id:4,name:'Priya Devi',initials:'PD',role:'limited',relation:'Parent',budget:8000,spent:7400,color:'av-orange'},
+];
+
+const activities=[
+  {name:'Ravi',initials:'RS',color:'av-teal',action:'added <strong>₹320</strong> in Travel',time:'2 min ago',amt:'₹320'},
+  {name:'Aarav',initials:'AS',color:'av-blue',action:'added <strong>₹150</strong> in Food',time:'18 min ago',amt:'₹150'},
+  {name:'Tanishqa',initials:'TA',color:'av-purple',action:'updated budget for <strong>Priya Devi</strong>',time:'1 hr ago',amt:''},
+  {name:'Priya',initials:'PD',color:'av-orange',action:'added <strong>₹800</strong> in Shopping',time:'3 hrs ago',amt:'₹800'},
+  {name:'Ravi',initials:'RS',color:'av-teal',action:'added <strong>₹2,200</strong> in Food',time:'Yesterday',amt:'₹2,200'},
+  {name:'Tanishqa',initials:'TA',color:'av-purple',action:'invited <strong>cousin@gmail.com</strong> to group',time:'2 days ago',amt:''},
+];
+
+const roleLabels={admin:'Admin',member:'Member',limited:'Limited'};
+const roleBadgeClass={admin:'role-admin',member:'role-member',limited:'role-limited'};
+const spentColors=['#7c5af5','#4ecca3','#5bc8f5','#f5954b'];
+
+function pct(spent,budget){return Math.min(100,Math.round(spent/budget*100))}
+
+function renderMembers(){
+  document.getElementById('membersList').innerHTML=members.map((m,i)=>{
+    const p=pct(m.spent,m.budget);
+    const over=p>=90;
+    return `<div class="member-card" onclick="selectMember(${m.id})">
+      <div class="member-top">
+        <div class="avatar ${m.color}">${m.initials}</div>
+        <div>
+          <div class="member-name">${m.name}</div>
+          <div class="member-role">${m.relation}</div>
+        </div>
+        <div class="member-meta">
+          <span class="role-badge ${roleBadgeClass[m.role]}">${roleLabels[m.role]}</span>
+        </div>
+      </div>
+      <div class="spend-row">
+        <span class="spend-label">Spent this month</span>
+        <span style="display:flex;align-items:center;gap:6px">
+          <span class="spend-amt">₹${m.spent.toLocaleString('en-IN')}</span>
+          <span class="spend-pct">/ ₹${m.budget.toLocaleString('en-IN')}</span>
+        </span>
+      </div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${p}%;background:${over?'#f5954b':spentColors[i%4]}"></div></div>
+      ${over?`<div class="warn-text">⚠ ${p}% of budget used</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderAlloc(){
+  document.getElementById('allocList').innerHTML=members.map((m,i)=>{
+    const p=pct(m.spent,m.budget);
+    const over=p>=90;
+    return `<div class="alloc-item">
+      <div class="alloc-top">
+        <div class="alloc-name"><div class="avatar ${m.color}" style="width:28px;height:28px;font-size:11px">${m.initials}</div>${m.name}</div>
+        <div class="alloc-right">
+          <div class="alloc-spent" style="color:${over?'var(--orange)':'var(--text)'}">₹${m.spent.toLocaleString('en-IN')}</div>
+          <div class="alloc-limit">of ₹${m.budget.toLocaleString('en-IN')}</div>
+        </div>
+      </div>
+      <div class="alloc-bar-bg"><div class="alloc-bar-fill" style="width:${p}%;background:${over?'#f5954b':spentColors[i%4]}"></div></div>
+      ${over?`<div class="warn-text">⚠ Budget almost exhausted!</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderActivity(){
+  document.getElementById('activityList').innerHTML=activities.map(a=>`
+    <div class="act-item">
+      <div class="act-avatar ${a.color}" style="width:32px;height:32px;font-size:11px">${a.initials}</div>
+      <div class="act-body">
+        <div class="act-text"><strong>${a.name}</strong> ${a.action}</div>
+        <div class="act-time">${a.time}</div>
+      </div>
+      ${a.amt?`<div class="act-amt">${a.amt}</div>`:''}
+    </div>`).join('');
+}
+
+function renderPerms(){
+  document.getElementById('permTable').innerHTML=members.map(m=>`
+    <tr>
+      <td style="color:var(--text)">${m.name.split(' ')[0]}</td>
+      <td><div class="toggle-wrap"><div class="toggle ${m.role!=='limited'?'on':''}" onclick="this.classList.toggle('on')"></div></div></td>
+      <td><div class="toggle-wrap"><div class="toggle ${m.role==='admin'?'on':''}" onclick="this.classList.toggle('on')"></div></div></td>
+      <td><div class="toggle-wrap"><div class="toggle ${m.role==='admin'?'on':''}" onclick="this.classList.toggle('on')"></div></div></td>
+    </tr>`).join('');
+}
+
+function selectMember(id){
+  document.querySelectorAll('.member-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.member-card')[id-1]?.classList.add('selected');
+  const m=members.find(x=>x.id===id);
+  showToast(`${m.name} — ₹${m.spent.toLocaleString('en-IN')} spent of ₹${m.budget.toLocaleString('en-IN')} budget`);
+}
+
+function openAddModal(){document.getElementById('modalOverlay').classList.add('open');document.body.style.overflow='hidden'}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=''}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+function addMember(){
+  const name=document.getElementById('newName').value.trim();
+  const budget=parseInt(document.getElementById('newBudget').value)||5000;
+  const role=document.getElementById('newRole').value;
+  const relation=document.getElementById('newRelation').value;
+  if(!name){showToast('Please enter a name!');return}
+  const initials=name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const colors=['av-purple','av-teal','av-blue','av-orange'];
+  members.push({id:members.length+1,name,initials,role,relation,budget,spent:0,color:colors[members.length%4]});
+  document.getElementById('totalMembers').textContent=members.length;
+  renderMembers();renderAlloc();renderPerms();
+  closeModal();
+  showToast(`${name} added to group!`);
+  document.getElementById('newName').value='';
+  document.getElementById('newBudget').value='';
+}
+
+function sendInvite(){
+  const email=document.getElementById('inviteEmail').value.trim();
+  if(!email||!email.includes('@')){showToast('Please enter a valid email!');return}
+  const item=document.createElement('div');
+  item.className='pending-item';
+  item.innerHTML=`<span class="pending-email">${email}</span><div style="display:flex;align-items:center;gap:8px"><span class="pending-badge">Pending</span><button class="revoke-btn" onclick="revokeInvite(this)">Revoke</button></div>`;
+  document.getElementById('pendingList').appendChild(item);
+  document.getElementById('inviteEmail').value='';
+  showToast(`Invite sent to ${email}`);
+}
+
+function revokeInvite(btn){
+  btn.closest('.pending-item').remove();
+  showToast('Invite revoked');
+}
+
+let toastTimer;
+function showToast(msg){
+  clearTimeout(toastTimer);
+  document.getElementById('toastMsg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+renderMembers();renderAlloc();renderActivity();renderPerms();
+</script>
+</body>
+</html>
