@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinTrack – Login / Sign Up</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0e1a;--surface:#1a1632;--surface2:#211d3a;--border:#2a2550;
+  --accent:#7c5af5;--accent2:#5bc8f5;--green:#4ecca3;--text:#e8e5ff;
+  --text-dim:#9893c0;--text-mid:#c8c2f0;--sidebar:#130f2a;--orange:#f5954b;--yellow:#f5d65b;
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text)}
+.glow-orb{pointer-events:none;position:fixed;border-radius:50%;z-index:0}
+.glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(124,90,245,0.12) 0%,transparent 70%);top:-120px;right:-80px}
+.glow-2{width:350px;height:350px;background:radial-gradient(circle,rgba(78,204,163,0.08) 0%,transparent 70%);bottom:5%;left:5%}
+.page{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+/* BRAND */
+.brand{display:flex;align-items:center;gap:8px;margin-bottom:28px}
+.brand-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text)}
+.brand-tag{font-size:12px;color:var(--text-dim);margin-top:4px;text-align:center}
+
+/* AUTH CARD */
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:32px 28px;width:100%;max-width:420px}
+
+/* TABS */
+.tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:24px;gap:4px}
+.tab-btn{flex:1;padding:9px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--text-dim);font-family:'DM Sans',sans-serif}
+.tab-btn.active{background:var(--accent);color:#fff}
+.tab-btn:not(.active):hover{color:var(--text-mid)}
+
+/* PANELS */
+.panel{display:none}
+.panel.active{display:block}
+
+/* FORM */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--text-dim);margin-bottom:6px;display:block;letter-spacing:.3px}
+.inp-wrap{position:relative}
+.form-inp{
+  width:100%;background:var(--bg);border:1px solid #3a3565;
+  border-radius:8px;color:var(--text);padding:10px 12px;
+  font-size:13px;outline:none;font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;
+}
+.form-inp:focus{border-color:var(--accent)}
+.form-inp::placeholder{color:#3a3565}
+.form-inp.error{border-color:var(--orange)}
+.form-inp.error::placeholder{color:var(--orange)}
+.eye-btn{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--text-dim);cursor:pointer;
+  font-size:14px;padding:2px 4px;opacity:.6;transition:opacity .2s;
+}
+.eye-btn:hover{opacity:1}
+
+/* FORGOT */
+.forgot{text-align:right;margin-bottom:6px}
+.forgot a{font-size:12px;color:var(--accent);text-decoration:none}
+.forgot a:hover{text-decoration:underline}
+
+/* SUBMIT */
+.submit-btn{
+  width:100%;padding:12px;background:var(--accent);border:none;
+  border-radius:10px;color:#fff;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:'Syne',sans-serif;transition:opacity .2s;
+  margin-top:4px;letter-spacing:.3px;
+}
+.submit-btn:hover{opacity:.85}
+.submit-btn:active{opacity:.7}
+
+/* DIVIDER */
+.divider{display:flex;align-items:center;gap:10px;margin:18px 0}
+.divider-line{flex:1;height:1px;background:var(--border)}
+.divider-text{font-size:12px;color:#3a3565}
+
+/* SOCIAL */
+.social-row{display:flex;gap:10px}
+.social-btn{
+  flex:1;padding:10px;background:var(--bg);border:1px solid #3a3565;
+  border-radius:8px;color:var(--text-mid);font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color .2s,color .2s;text-align:center;
+}
+.social-btn:hover{border-color:var(--accent);color:var(--text)}
+
+/* PASSWORD STRENGTH */
+.strength-bar{display:flex;gap:4px;margin-top:6px}
+.s-seg{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background .3s}
+.strength-label{font-size:11px;color:var(--text-dim);margin-top:4px}
+
+/* SWITCH TEXT */
+.switch-text{text-align:center;font-size:12px;color:var(--text-dim);margin-top:18px}
+.switch-text a{color:var(--accent);text-decoration:none;font-weight:600}
+.switch-text a:hover{text-decoration:underline}
+
+/* TERMS */
+.terms{font-size:11px;color:#3a3565;text-align:center;margin-top:14px;line-height:1.6}
+.terms a{color:var(--text-dim);text-decoration:none}
+.terms a:hover{color:var(--accent)}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  opacity:0;z-index:2000;background:var(--surface);border:1px solid var(--green);
+  border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--text);transition:transform .3s,opacity .3s;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);min-width:220px;justify-content:center;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast.error-toast{border-color:var(--orange)}
+
+/* REVEAL */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.auth-card{animation:fadeUp .4s ease}
+</style>
+</head>
+<body>
+
+<div class="glow-orb glow-1"></div>
+<div class="glow-orb glow-2"></div>
+
+<div class="page">
+
+  <div class="brand">
+    <span style="font-size:26px">💰</span>
+    <div>
+      <div class="brand-name">FinTrack</div>
+      <div class="brand-tag">Your smart finance dashboard</div>
+    </div>
+  </div>
+
+  <div class="auth-card">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Log In</button>
+      <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- ═══════════════ LOGIN PANEL ═══════════════ -->
+    <div id="loginPanel" class="panel active">
+
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-inp" type="email" id="loginEmail" placeholder="you@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="inp-wrap">
+          <input class="form-inp" type="password" id="loginPass" placeholder="Enter your password" style="padding-right:38px" />
+          <button class="eye-btn" onclick="togglePass('loginPass',this)" title="Show/hide password">&#128065;</button>
+        </div>
+      </div>
+
+      <div class="forgot"><a href="#">Forgot password?</a></div>
+
+      <button class="submit-btn" onclick="handleLogin()">Log In</button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">or continue with</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <div class="social-row">
+        <button class="social-btn" onclick="socialLogin('Google')">G &nbsp; Google</button>
+        <button class="social-btn" onclick="socialLogin('Facebook')">f &nbsp; Facebook</button>
+      </div>
+
+      <div class="switch-text">Don't have an account? <a href="#" onclick="switchTab('signup');return false">Sign up free</a></div>
+
+    </div>
+
+    <!-- ═══════════════ SIGN UP PANEL ═══════════════ -->
+    <div id="signupPanel" class="panel">
+
+      <div class="form-group">
+        <label class="form-label">Full name</label>
+        <input class="form-inp" type="text" id="signupName" placeholder="Your full name" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-inp" type="email" id="signupEmail" placeholder="you@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <div class="inp-wrap">
+          <input class="form-inp" type="password" id="signupPass" placeholder="Create a password" style="padding-right:38px" oninput="checkStrength(this.value)" />
+          <button class="eye-btn" onclick="togglePass('signupPass',this)" title="Show/hide password">&#128065;</button>
+        </div>
+        <div class="strength-bar">
+          <div class="s-seg" id="s1"></div>
+          <div class="s-seg" id="s2"></div>
+          <div class="s-seg" id="s3"></div>
+          <div class="s-seg" id="s4"></div>
+        </div>
+        <div class="strength-label" id="strengthLabel">Enter a password</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Confirm password</label>
+        <div class="inp-wrap">
+          <input class="form-inp" type="password" id="signupConfirm" placeholder="Repeat your password" style="padding-right:38px" />
+          <button class="eye-btn" onclick="togglePass('signupConfirm',this)" title="Show/hide password">&#128065;</button>
+        </div>
+      </div>
+
+      <button class="submit-btn" onclick="handleSignup()">Create Account</button>
+
+      <div class="terms">
+        By signing up you agree to our
+        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+      </div>
+
+      <div class="switch-text">Already have an account? <a href="#" onclick="switchTab('login');return false">Log in</a></div>
+
+    </div>
+    <!-- ════════════════════════════════════════════ -->
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastIcon">✅</span>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+/* ─── Tab Switch ─── */
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+  document.getElementById('loginPanel').classList.toggle('active', isLogin);
+  document.getElementById('signupPanel').classList.toggle('active', !isLogin);
+  clearErrors();
+}
+
+/* ─── Toggle Password Visibility ─── */
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.style.opacity = show ? '1' : '0.6';
+}
+
+/* ─── Password Strength ─── */
+function checkStrength(val) {
+  const segs = ['s1','s2','s3','s4'].map(id => document.getElementById(id));
+  const lbl = document.getElementById('strengthLabel');
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const colors = ['#f5954b','#f5d65b','#5bc8f5','#4ecca3'];
+  const labels = ['Weak — add uppercase or numbers','Fair — try adding a symbol','Good — almost there!','Strong password'];
+  segs.forEach((s, i) => { s.style.background = i < score ? colors[score - 1] : 'var(--border)'; });
+  if (!val.length) {
+    lbl.textContent = 'Enter a password';
+    lbl.style.color = 'var(--text-dim)';
+  } else {
+    lbl.textContent = labels[score - 1] || 'Too short (min 8 chars)';
+    lbl.style.color = score > 0 ? colors[score - 1] : '#f5954b';
+  }
+}
+
+/* ─── Login Handler ─── */
+function handleLogin() {
+  clearErrors();
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+
+  if (!email) { setError('loginEmail', 'Email is required'); return; }
+  if (!isValidEmail(email)) { setError('loginEmail', 'Enter a valid email'); return; }
+  if (!pass)  { setError('loginPass', 'Password is required'); return; }
+
+  // ── Replace with real API call ──
+  // fetch('http://localhost:5000/api/auth/login', {
+  //   method: 'POST',
+  //   headers: {'Content-Type':'application/json'},
+  //   body: JSON.stringify({ email, password: pass })
+  // }).then(r => r.json()).then(data => {
+  //   if (data.token) { localStorage.setItem('token', data.token); window.location.href = 'index.html'; }
+  //   else showToast(data.message || 'Login failed', true);
+  // });
+
+  showToast('✅  Logged in! Redirecting…');
+  setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+}
+
+/* ─── Signup Handler ─── */
+function handleSignup() {
+  clearErrors();
+  const name    = document.getElementById('signupName').value.trim();
+  const email   = document.getElementById('signupEmail').value.trim();
+  const pass    = document.getElementById('signupPass').value;
+  const confirm = document.getElementById('signupConfirm').value;
+
+  if (!name)                     { setError('signupName', 'Name is required'); return; }
+  if (!email)                    { setError('signupEmail', 'Email is required'); return; }
+  if (!isValidEmail(email))      { setError('signupEmail', 'Enter a valid email'); return; }
+  if (pass.length < 8)           { setError('signupPass', 'Min 8 characters'); return; }
+  if (pass !== confirm)          { setError('signupConfirm', 'Passwords do not match'); return; }
+
+  // ── Replace with real API call ──
+  // fetch('http://localhost:5000/api/auth/register', {
+  //   method: 'POST',
+  //   headers: {'Content-Type':'application/json'},
+  //   body: JSON.stringify({ name, email, password: pass })
+  // }).then(r => r.json()).then(data => {
+  //   if (data.userId) { switchTab('login'); showToast('Account created! Please log in.'); }
+  //   else showToast(data.message || 'Signup failed', true);
+  // });
+
+  showToast('🎉  Account created! Welcome to FinTrack.');
+  setTimeout(() => { switchTab('login'); }, 1800);
+}
+
+/* ─── Social Login ─── */
+function socialLogin(provider) {
+  showToast(`🔗  Connecting to ${provider}…`);
+  // window.location.href = `http://localhost:5000/api/auth/${provider.toLowerCase()}`;
+}
+
+/* ─── Helpers ─── */
+function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function setError(id, msg) {
+  const el = document.getElementById(id);
+  el.classList.add('error');
+  el.placeholder = msg;
+  el.value = '';
+}
+
+function clearErrors() {
+  document.querySelectorAll('.form-inp').forEach(el => {
+    el.classList.remove('error');
+  });
+}
+
+let toastTimer;
+function showToast(msg, isError = false) {
+  clearTimeout(toastTimer);
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.toggle('error-toast', isError);
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
