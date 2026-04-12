@@ -1,0 +1,9 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "title": "Emergency Fund",
+    "targetAmount": 100000,
+    "savedAmount": 35000
+  }
+]

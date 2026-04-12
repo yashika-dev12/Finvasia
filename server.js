@@ -8,19 +8,37 @@
 //    5. Open: http://localhost:5000
 // ============================================================
 
-const express = require('express');
-const cors    = require('cors');
-const fs      = require('fs');
-const path    = require('path');
-
-const app  = express();
+import path from "path";
+import { fileURLToPath } from "url";
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import fs from "fs";
+let user = {
+  balance: 20000,
+  expenses: [],
+  savings: 0,
+  creditScore: 650
+};
+let chatHistory = [];
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// app.get("/", (req, res) => {
+//   res.sendFile(path.join(__dirname, "public", "index.html"));
+// });
+// const express = require('express');
+// const cors    = require('cors');
+// const fs      = require('fs');
+// const path    = require('path');
+dotenv.config();
+const app = express();
 const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
 
 // ── Serve your HTML files from the same folder ──
-app.use(express.static());
+app.use(express.static("public"));
 
 // ============================================================
 //  DATABASE  (plain JSON files — no install needed)
@@ -304,6 +322,72 @@ app.get('/api/reports/monthly', (req, res) => {
   res.json(data);
 });
 
+app.post("/api/ai-response", (req, res) => {
+  const { message } = req.body;
+  const msg = message.toLowerCase();
+
+  let reply = "";
+
+  if (msg.includes("invest")) {
+    reply = `
+📊 Investment Advice:
+Investing is a great long-term strategy, but you should start carefully.
+
+💡 Suggestion:
+Begin with low-risk options like SIPs or index funds instead of directly buying high-volatility stocks.
+
+⚠️ Risk Level: Medium
+
+📌 Tip:
+Always keep an emergency fund before investing.
+    `;
+  }
+
+  else if (msg.includes("stock")) {
+    reply = `
+📈 Stock Market Advice:
+Stocks can give high returns but are highly volatile in the short term.
+
+💡 Suggestion:
+Focus on long-term investing rather than daily trading.
+
+⚠️ Risk Level: High
+
+📌 Tip:
+Research companies before investing.
+    `;
+  }
+
+  else if (msg.includes("save")) {
+    reply = `
+💰 Savings Advice:
+Saving money is the foundation of financial stability.
+
+💡 Suggestion:
+Try saving at least 20–30% of your monthly income.
+
+⚠️ Risk Level: Low
+
+📌 Tip:
+Automate your savings if possible.
+    `;
+  }
+
+  else {
+    reply = `
+🤖 Financial Assistant:
+I can help you with investing, saving, budgeting, and financial planning.
+
+💡 Try asking:
+- Should I invest?
+- How to save money?
+- Is stock trading safe?
+    `;
+  }
+
+  res.json({ reply });
+});
+
 // ============================================================
 //  START
 // ============================================================
@@ -312,3 +396,6 @@ app.listen(PORT, () => {
   console.log(`📁  Database files are in the  db/  folder`);
   console.log(`🌐  Open http://localhost:${PORT}/index.html to view your app\n`);
 });
+
+
+

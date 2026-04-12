@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "icon": "⚠️",
+    "message": "You crossed your ₹15,000 monthly budget.",
+    "read": false
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "icon": "🔥",
+    "message": "You saved more than last week!",
+    "read": false
+  }
+]

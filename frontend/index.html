@@ -279,18 +279,23 @@ function addExpense(){
   if(amt>0){expenses[cat]=(expenses[cat]||0)+amt;updateList();}
 }
 
-function askAI(){
-  const q=document.getElementById('aiQ').value.trim();
-  if(!q)return;
-  const ans=document.getElementById('aiAnswer');
-  ans.innerHTML='<span>⏳</span><span style="color:#9893c0">Thinking...</span>';
-  setTimeout(()=>{
-    const lower=q.toLowerCase();
-    const positive=lower.includes('save')||lower.includes('fixed')||lower.includes('bond')||lower.includes('fd');
-    if(positive){ans.innerHTML='<span>✅</span><span style="color:#4ecca3">Recommended — low risk option</span>';}
-    else{ans.innerHTML='<span>❌</span><span style="color:#f5954b">Not recommended — review risk</span>';}
-  },800);
-  document.getElementById('aiQ').value='';
+async function askAI() {
+  const question = document.getElementById("aiQ").value;
+
+  const res = await fetch("/api/ai-advisor", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ question })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("aiAnswer").innerHTML = `
+    <span>🤖</span>
+    <span>${data.advice}</span>
+  `;
 }
 </script>
 
@@ -331,7 +336,7 @@ function askAI(){
 // 🔄 Load Dashboard Data from Backend
 async function initDashboard() {
     try {
-        const res = await fetch(`${API_URL}/dashboard`);
+        const res = await fetch(`http://localhost:5000/api/dashboard`);
         const data = await res.json();
         
         // Update the UI with real database values
@@ -353,7 +358,7 @@ async function addExpense() {
     const amt = document.getElementById('expAmt').value;
     const cat = document.getElementById('expCat').value;
 
-    const res = await fetch(`${API_URL}/expense`, {
+    const res = await fetch(`/api/expense`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ amount: parseInt(amt), category: cat })

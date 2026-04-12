@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "date": "12 Jun",
+    "description": "Swiggy Order",
+    "category": "Food",
+    "amount": 850,
+    "status": "done"
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "date": "11 Jun",
+    "description": "Zomato x3",
+    "category": "Food",
+    "amount": 1200,
+    "status": "done"
+  },
+  {
+    "id": 3,
+    "userId": 1,
+    "date": "10 Jun",
+    "description": "Ola Cab",
+    "category": "Travel",
+    "amount": 320,
+    "status": "done"
+  },
+  {
+    "id": 4,
+    "userId": 1,
+    "date": "09 Jun",
+    "description": "Amazon Order",
+    "category": "Shopping",
+    "amount": 2200,
+    "status": "done"
+  },
+  {
+    "id": 5,
+    "userId": 1,
+    "date": "08 Jun",
+    "description": "Grocery Store",
+    "category": "Food",
+    "amount": 3400,
+    "status": "done"
+  },
+  {
+    "id": 6,
+    "userId": 1,
+    "date": "07 Jun",
+    "description": "Train Ticket",
+    "category": "Travel",
+    "amount": 980,
+    "status": "done"
+  },
+  {
+    "id": 7,
+    "userId": 1,
+    "date": "06 Jun",
+    "description": "Myntra",
+    "category": "Shopping",
+    "amount": 1800,
+    "status": "done"
+  },
+  {
+    "id": 8,
+    "userId": 1,
+    "date": "05 Jun",
+    "description": "Cafe Coffee Day",
+    "category": "Food",
+    "amount": 450,
+    "status": "done"
+  }
+]
