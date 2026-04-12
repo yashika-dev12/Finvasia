@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 
+=======
+<link rel="stylesheet" href="responsive.css">
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans)}
@@ -80,10 +84,15 @@ body{font-family:var(--font-sans)}
         grid-template-columns: 1fr; /* Stack balance/credit cards */
     }
 }
+<<<<<<< HEAD
 
 </style>
 
 
+=======
+</style>
+
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
 <div class="dash">
   <div class="sidebar">
     <a href="index.html" class="s-icon active" title="Home">🏠</a>
@@ -101,7 +110,11 @@ body{font-family:var(--font-sans)}
     <div class="top-row">
       <div class="card">
         <div class="metric-label">Total Balance</div>
+<<<<<<< HEAD
         <div class="metric-val" id="balanceText"></div>
+=======
+        <div class="metric-val">₹20,500</div>
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
         <span class="badge-green">+12% this month</span>
       </div>
       <div class="card credit-inner">
@@ -115,13 +128,21 @@ body{font-family:var(--font-sans)}
             <circle cx="32" cy="32" r="26" fill="none" stroke="url(#ringGrad)" stroke-width="6" stroke-dasharray="113" stroke-dashoffset="28" stroke-linecap="round" transform="rotate(-90 32 32)"/>
             <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5bc8f5"/><stop offset="100%" stop-color="#7c5af5"/></linearGradient></defs>
           </svg>
+<<<<<<< HEAD
           <div class="ring-val" id="creditScoreText"></div>
+=======
+          <div class="ring-val">720</div>
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
         </div>
       </div>
       <div class="card">
         <div class="metric-label">Goal Progress</div>
         <div style="display:flex;align-items:baseline;gap:6px;margin:4px 0">
+<<<<<<< HEAD
           <span class="goal-pct" id="goalPctText"></span>
+=======
+          <span class="goal-pct">35%</span>
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
           <span style="font-size:12px;color:#9893c0">completed</span>
         </div>
         <div class="goal-bar-bg"><div class="goal-bar"></div></div>
@@ -169,7 +190,11 @@ body{font-family:var(--font-sans)}
       <div class="input-row">
         <span style="color:#9893c0;font-size:14px">₹</span>
         <input class="inp" id="expAmt" type="number" value="500" placeholder="Amount">
+<<<<<<< HEAD
         <select class="sel" id="expCat" aria-label="Expense Category">
+=======
+        <select class="sel" id="expCat">
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
           <option>Food</option><option>Travel</option><option>Shopping</option><option>Other</option>
         </select>
         <button class="btn-add" onclick="addExpense()">Add</button>
@@ -185,7 +210,18 @@ body{font-family:var(--font-sans)}
 
   <div class="right">
     <div class="right-title">SMART ALERTS</div>
+<<<<<<< HEAD
      <div id="alertsContainer"></div>
+=======
+    <div class="alert-card">
+      <span class="alert-icon">⚠️</span>
+      <span class="alert-text">You crossed your <strong>₹15,000</strong> monthly budget.</span>
+    </div>
+    <div class="alert-card">
+      <span class="alert-icon">🔥</span>
+      <span class="alert-text">You saved <strong>more</strong> than last week!</span>
+    </div>
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d
 
     <div class="right-title" style="margin-top:6px">SMART ALERTS</div>
     <div class="rec-card">
@@ -227,6 +263,7 @@ body{font-family:var(--font-sans)}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+<<<<<<< HEAD
   // --- CHART SETUP ---
   new Chart(document.getElementById('growthChart'),{
     type:'line',
@@ -351,3 +388,194 @@ body{font-family:var(--font-sans)}
   // Start the app by fetching data when the page loads
   window.onload = initDashboard;
 </script>
+=======
+const expenses = {Food:12000,Travel:7000,Shopping:5500};
+
+new Chart(document.getElementById('growthChart'),{
+  type:'line',
+  data:{
+    labels:['Jan','Feb','Mar','Apr','May','Jun'],
+    datasets:[{
+      data:[2000,3000,4500,5500,9500,8500],
+      borderColor:'#7c5af5',
+      backgroundColor:'rgba(124,90,245,0.15)',
+      fill:true,
+      tension:0.4,
+      pointBackgroundColor:'#7c5af5',
+      pointRadius:4,
+      borderWidth:2
+    }]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e6a90',font:{size:11}}},
+      y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6e6a90',font:{size:11},callback:v=>'₹'+Math.round(v/1000)+'k'},min:0,max:12000}
+    }
+  }
+});
+
+document.querySelectorAll('.rtab').forEach(t=>{
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.rtab').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+function updateList(){
+  const list=document.getElementById('trackerList');
+  list.innerHTML=Object.entries(expenses).map(([k,v])=>`<div class="trow"><span class="tcat">${k}</span><span class="tamt">₹${v.toLocaleString('en-IN')}</span></div>`).join('');
+  const total=Object.values(expenses).reduce((a,b)=>a+b,0);
+  document.getElementById('totalSpent').textContent='Total Spent: ₹'+total.toLocaleString('en-IN');
+}
+function addExpense(){
+  const amt=parseInt(document.getElementById('expAmt').value)||0;
+  const cat=document.getElementById('expCat').value;
+  if(amt>0){expenses[cat]=(expenses[cat]||0)+amt;updateList();}
+}
+
+async function askAI() {
+  const question = document.getElementById("aiQ").value;
+
+  const res = await fetch("/api/ai-advisor", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ question })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("aiAnswer").innerHTML = `
+    <span>🤖</span>
+    <span>${data.advice}</span>
+  `;
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+
+    // Update Date/Time
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('dateTime').innerText = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' });
+    }
+    updateTime();
+
+    // AI Advisor Simulation
+    function askAI() {
+        const q = document.getElementById('aiQ').value.toLowerCase();
+        const ans = document.getElementById('aiAnswer');
+        if(!q) return;
+
+        ans.innerHTML = "<span style='color:var(--text-dim)'>AI is analyzing markets...</span>";
+        
+        setTimeout(() => {
+            if (q.includes('invest') || q.includes('gold') || q.includes('buy')) {
+                ans.innerHTML = "✅ <span style='color:var(--green)'>Market trends suggest a buy. Diversify 5% of your portfolio.</span>";
+            } else if (q.includes('save')) {
+                ans.innerHTML = "💡 <span style='color:var(--accent)'>Cut down on Shopping to increase savings by ₹2,000 this month.</span>";
+            } else {
+                ans.innerHTML = "🤖 <span>Interesting question! Based on your ₹20k balance, keep a 3-month emergency fund first.</span>";
+            }
+        }, 1000);
+    }
+</script>
+
+<script>
+
+  const API_URL = "http://localhost:5000/api";
+
+// 🔄 Load Dashboard Data from Backend
+async function initDashboard() {
+    try {
+        const res = await fetch(`http://localhost:5000/api/dashboard`);
+        const data = await res.json();
+        
+        // Update the UI with real database values
+        document.getElementById('balanceText').innerText = `₹${data.user.balance.toLocaleString('en-IN')}`;
+        document.getElementById('creditScoreText').innerText = data.user.creditScore;
+        document.getElementById('goalPctText').innerText = `${data.goalPct}%`;
+        document.querySelector('.goal-bar').style.width = `${data.goalPct}%`;
+        
+        // Update Alerts
+        const alertBox = document.querySelector('.right'); // Or a specific alert container
+        // Logic to clear and append alerts from data.alerts...
+    } catch (err) {
+        console.error("Backend not running? ", err);
+    }
+}
+
+// 💸 Send Expense to Backend
+async function addExpense() {
+    const amt = document.getElementById('expAmt').value;
+    const cat = document.getElementById('expCat').value;
+
+    const res = await fetch(`/api/expense`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ amount: parseInt(amt), category: cat })
+    });
+    const data = await res.json();
+    
+    if(data.recommendation) {
+        alert("🛡️ Smart Suggestion: " + data.recommendation);
+    }
+    initDashboard(); // Refresh UI instantly
+}
+
+// Start the app
+// window.onload = initDashboard;
+</script>
+
+
+<script>
+async function addExpense() {
+  const data = {
+    title: "Food",
+    amount: 500,
+    category: "Food"
+  };
+
+  const res = await fetch("http://localhost:5000/api/expense", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+  alert(result.message);
+
+  // await fetch(...);
+
+alert(result.message);
+
+loadExpenses(); // 👈 ADD THIS
+}
+
+async function loadExpenses() {
+  const res = await fetch("http://localhost:5000/api/expense");
+  const data = await res.json();
+
+  const list = document.getElementById('trackerList');
+
+  list.innerHTML = data.map(e => `
+    <div class="trow">
+      <span class="tcat">${e.category}</span>
+      <span class="tamt">₹${e.amount}</span>
+    </div>
+  `).join('');
+}
+
+
+window.onload = loadExpenses;
+</script>
+
+
+>>>>>>> 254daaaeef18c2fb2d1afb8e3fb51e2a8f77589d

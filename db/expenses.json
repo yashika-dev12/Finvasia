@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "category": "Food",
+    "amount": 12500,
+    "month": "June",
+    "year": 2025
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "category": "Travel",
+    "amount": 7000,
+    "month": "June",
+    "year": 2025
+  },
+  {
+    "id": 3,
+    "userId": 1,
+    "category": "Shopping",
+    "amount": 5500,
+    "month": "June",
+    "year": 2025
+  }
+]

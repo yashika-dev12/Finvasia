@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "name": "Tanishqa",
+    "email": "tanishqa@example.com",
+    "password": "pass123",
+    "balance": 20500,
+    "creditScore": 720,
+    "monthlyBudget": 30000
+  }
+]
