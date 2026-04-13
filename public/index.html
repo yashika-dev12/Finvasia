@@ -87,7 +87,7 @@ body{font-family:var(--font-sans)}
 
     <div class="top-row">
       <div class="card">
-        <div class="metric-label">Total Balance</div>
+        <div class="metric-label" id="balance">Total Balance</div>
         <div class="metric-val">₹20,500</div>
         <span class="badge-green">+12% this month</span>
       </div>
@@ -222,7 +222,7 @@ body{font-family:var(--font-sans)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const expenses = {Food:12000,Travel:7000,Shopping:5500};
-
+let balance = 20500; // put at TOP of file
 new Chart(document.getElementById('growthChart'),{
   type:'line',
   data:{
@@ -263,10 +263,45 @@ function updateList(){
   document.getElementById('totalSpent').textContent='Total Spent: ₹'+total.toLocaleString('en-IN');
 }
 
-function addExpense(){
-  const amt=parseInt(document.getElementById('expAmt').value)||0;
-  const cat=document.getElementById('expCat').value;
-  if(amt>0){expenses[cat]=(expenses[cat]||0)+amt;updateList();}
+
+function addExpense() {
+    // 1. Get elements from HTML
+    const amtInput = document.getElementById("expAmt");
+    const catInput = document.getElementById("expCat");
+    const balanceVal = document.querySelector(".top-row .card:nth-child(1) .metric-val");
+    const investmentVal = document.querySelector(".amt-purple"); // "₹1000" at the top
+
+    // 2. Parse the amount (Get the value FIRST)
+    let amount = parseInt(amtInput.value);
+
+    // 3. Validation
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount");
+        return;
+    }
+
+    // 4. Update the Data Objects
+    const category = catInput.value;
+    if (expenses[category]) {
+        expenses[category] += amount;
+    } else {
+        expenses[category] = amount;
+    }
+
+    // 5. Update Global Balance (Substracting from the ₹20,500)
+    balance -= amount;
+    balanceVal.innerText = "₹" + balance.toLocaleString('en-IN');
+
+    // 6. Update Credit/Investment Numbers (As you requested)
+    // Let's assume every "Add" also increases your investment tracking number slightly
+    let currentInv = parseInt(investmentVal.innerText.replace('₹', ''));
+    investmentVal.innerText = "₹" + (currentInv + 100); 
+
+    // 7. Refresh the UI List
+    updateList();
+
+    // 8. Clear input for next use
+    amtInput.value = "";
 }
 
 function askAI(){
@@ -312,4 +347,25 @@ function askAI(){
             }
         }, 1000);
     }
+</script>
+
+<div class="modal-overlay" id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center;">
+  <div class="card" style="max-width:400px; padding:30px; position:relative;">
+    <button onclick="this.parentElement.parentElement.style.display='none'" style="position:absolute; top:10px; right:10px; background:none; border:none; color:white; cursor:pointer;">✕</button>
+    <div id="modalContent">
+      <h3 id="mTitle" style="margin-bottom:10px;">Investment Details</h3>
+      <p id="mBody" style="color:var(--text-dim); font-size:14px; line-height:1.6;">
+        Safe investments include Fixed Deposits and Government Bonds. These offer guaranteed returns with zero risk to your principal amount.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+function openLearnMore() {
+    document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+// Update your existing Learn More button to use this:
+// <div class="learn-btn" onclick="openLearnMore()">Learn more</div>
 </script>

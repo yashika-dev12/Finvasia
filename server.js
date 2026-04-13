@@ -160,29 +160,50 @@ app.get("/api/expenses", (req, res) => {
   res.json(data);
 });
 
+// app.post("/api/expense", (req, res) => {
+//   const { amount, category, userId = 1 } = req.body;
+//   if (!amount || !category) return res.status(400).json({ error: "amount and category required" });
+
+//   const expenses = readDB("expenses");
+//   const existing = expenses.find(e => e.userId === userId && e.category === category && e.month === "June");
+
+//   if (existing) {
+//     existing.amount += Number(amount);
+//   } else {
+//     expenses.push({ id: nextId(expenses), userId, category, amount: Number(amount), month: "June", year: 2025 });
+//   }
+//   writeDB("expenses", expenses);
+
+//   const total = expenses.filter(e => e.userId === userId && e.month === "June").reduce((s, e) => s + e.amount, 0);
+//   const user  = readDB("users").find(u => u.id === userId);
+//   const recommendation = total > user.monthlyBudget
+//     ? `You have crossed your monthly budget. Consider cutting back on ${category}.`
+//     : null;
+
+//   res.json({ success: true, recommendation });
+// });
+
+
 app.post("/api/expense", (req, res) => {
   const { amount, category, userId = 1 } = req.body;
   if (!amount || !category) return res.status(400).json({ error: "amount and category required" });
 
   const expenses = readDB("expenses");
-  const existing = expenses.find(e => e.userId === userId && e.category === category && e.month === "June");
+  const users = readDB("users"); // Load users
 
-  if (existing) {
-    existing.amount += Number(amount);
-  } else {
-    expenses.push({ id: nextId(expenses), userId, category, amount: Number(amount), month: "June", year: 2025 });
-  }
+  // 1. Save the expense
+  expenses.push({ id: nextId(expenses), userId, category, amount: Number(amount), month: "June", year: 2025 });
   writeDB("expenses", expenses);
 
-  const total = expenses.filter(e => e.userId === userId && e.month === "June").reduce((s, e) => s + e.amount, 0);
-  const user  = readDB("users").find(u => u.id === userId);
-  const recommendation = total > user.monthlyBudget
-    ? `You have crossed your monthly budget. Consider cutting back on ${category}.`
-    : null;
+  // 2. Subtract from User Balance in the DB
+  const user = users.find(u => u.id === userId);
+  if (user) {
+    user.balance -= Number(amount);
+    writeDB("users", users); // Save the updated balance to users.json
+  }
 
-  res.json({ success: true, recommendation });
+  res.json({ success: true, newBalance: user.balance });
 });
-
 // ============================================================
 //  TRANSACTION ROUTES
 // ============================================================
@@ -316,3 +337,18 @@ app.listen(PORT, () => {
   console.log(`\n🚀  FinTrack running at http://localhost:${PORT}`);
   console.log(`📁  DB files in db/ folder\n`);
 });
+
+
+let balance = 20500; // starting value
+
+function updateBalance(amount, type) {
+    if (type === "income") {
+        balance += amount;
+    } else {
+        balance -= amount;
+    }
+
+    document.getElementById("balance").innerText = "₹" + balance;
+}
+
+updateBalance(amount, "expense");

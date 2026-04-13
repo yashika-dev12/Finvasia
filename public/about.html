@@ -243,7 +243,7 @@
       <div class="vis-card back"></div>
       <div class="vis-card front">
         <div class="vis-label">Total Balance</div>
-        <div class="vis-value">₹20,500</div>
+<div class="vis-value" id="aboutBalance">₹20,500</div>
         <div class="vis-badge">+12% this month ↑</div>
         <div class="vis-bars">
           <div class="vis-bar" style="height:30%"></div>
@@ -337,19 +337,25 @@
         <div class="team-card" onclick="openModal('priya')">
           <div class="avatar av-purple">👩‍💻</div>
           <div class="team-name">Tanishqa</div>
-          <div class="team-role">Founder & Product Lead</div>
+          <div class="team-role">Frontend Manager</div>
           <div class="team-tag">View profile →</div>
         </div>
         <div class="team-card" onclick="openModal('rohan')">
           <div class="avatar av-teal">👩‍💻</div>
           <div class="team-name">Yashika Sehgal</div>
-          <div class="team-role">AI & Data Engineer</div>
+          <div class="team-role">Design and Product Lead</div>
           <div class="team-tag">View profile →</div>
         </div>
         <div class="team-card" onclick="openModal('anika')">
           <div class="avatar av-blue">👩‍🎨</div>
           <div class="team-name">Tanvee</div>
-          <div class="team-role">Design & Frontend</div>
+          <div class="team-role">AI & Backend</div>
+          <div class="team-tag">View profile →</div>
+        </div>
+        <div class="team-card" onclick="openModal('shagun')">
+          <div class="avatar av-teal">👩‍💻</div>
+          <div class="team-name">Shagun</div>
+          <div class="team-role">DataBase manager</div>
           <div class="team-tag">View profile →</div>
         </div>
       </div>
@@ -473,6 +479,13 @@ const modals = {
   'feat-goal': { icon:'🎯', tag:'Feature', title:'Goal Progress', body:'Define a financial goal — an emergency fund, a vacation, a gadget — and FinTrack tracks your progress towards it automatically. Milestone celebrations keep you motivated.', details:[{icon:'📐',text:'Set custom savings targets'},{icon:'📅',text:'Timeline-based projections'},{icon:'🎉',text:'Milestone celebrations'}] },
   priya: { icon:'👩‍💻', tag:'Co-founder', title:'Tanishqa', body:'Tanishqa has 8 years of experience in product management at fintech startups. She left a senior role at a Mumbai-based neobank to build FinTrack full-time. She is obsessed with making complex financial concepts accessible to everyone.', details:[{icon:'🏫',text:'IIM Ahmedabad, MBA Finance'},{icon:'💼',text:'Ex-Product Lead at NeoBank India'},{icon:'📍',text:'Bengaluru, Karnataka'}] },
   rohan: { icon:'👩‍💻', tag:'Co-founder', title:'Yashika Sehgal', body:'Yashika is a machine learning engineer specialising in time-series forecasting and anomaly detection. She built the AI advisor from scratch, training custom models on anonymised spending patterns from Indian users.', details:[{icon:'🏫',text:'IIT Bombay, B.Tech CS'},{icon:'💼',text:'Ex-ML Engineer at Bengaluru startup'},{icon:'📍',text:'Pune, Maharashtra'}] },
+  shagun: { 
+    icon:'👩‍💻', 
+    tag:'Team', 
+    title:'Shagun', 
+    body:'Expert in high-performance database management and data integrity.', 
+    details:[{icon:'💾',text:'Database Manager'},{icon:'🛡️',text:'Data Security'}] 
+  },
   anika: { icon:'👩‍🎨', tag:'Design Lead', title:'Tanvee', body:'Tanvee leads design and frontend development at FinTrack. She redesigned the entire dashboard in 2025 with a focus on information density and delight. Before FinTrack, she designed for a series-B SaaS startup in Delhi.', details:[{icon:'🏫',text:'NID Ahmedabad, Product Design'},{icon:'💼',text:'Ex-Senior Designer at SaaS startup'},{icon:'📍',text:'Delhi, India'}] },
   contact: { icon:'📬', tag:'Get in Touch', title:'Contact FinTrack', body:'We\'d love to hear from you — feature requests, bug reports, partnerships, or just a kind word. Our team usually responds within 24 hours.', details:[{icon:'📧',text:'contactfintrack@fintrack.in'},{icon:'🐦',text:'@FinTrackApp on Twitter / X'},{icon:'💼',text:'fintrack.in/careers for jobs'}] },
   privacy: { icon:'🔐', tag:'Privacy Policy', title:'Your data is yours', body:'FinTrack collects only the data required to provide a personalised experience. We never sell, rent, or share your financial data with third parties. All data is encrypted at rest using AES-256 and in transit via TLS 1.3.', details:[{icon:'🔒',text:'AES-256 encryption at rest'},{icon:'🌐',text:'TLS 1.3 in transit'},{icon:'🚫',text:'Zero data sold to advertisers'}] },
@@ -515,6 +528,22 @@ const observer = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.08 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// Function to sync balance from the server/local data
+async function syncAboutBalance() {
+    try {
+        const response = await fetch('http://localhost:5000/api/dashboard');
+        const data = await response.json();
+        if(data.user) {
+            document.getElementById('aboutBalance').innerText = "₹" + data.user.balance.toLocaleString('en-IN');
+        }
+    } catch (e) {
+        // Fallback if server isn't running
+        const localBalance = localStorage.getItem('userBalance') || "20,500";
+        document.getElementById('aboutBalance').innerText = "₹" + localBalance;
+    }
+}
+syncAboutBalance();
+
 </script>
 </body>
 </html>
