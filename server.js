@@ -22,9 +22,16 @@ const __dirname  = path.dirname(__filename);
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+// THEN keep this below
+app.use(express.static(path.join(__dirname, "public")));
+
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "frontend")));
+app.use(express.static(path.join(__dirname, "public")));
 
 // ============================================================
 //  JSON FILE DATABASE
@@ -102,23 +109,62 @@ seedIfEmpty();
 //  AUTH ROUTES
 // ============================================================
 
-app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
-  const user = readDB("users").find(u => u.email === email && u.password === password);
-  if (!user) return res.status(401).json({ error: "Invalid email or password" });
-  res.json({ success: true, token: `token_${user.id}`, userId: user.id, name: user.name });
+app.post("/api/expense", (req, res) => {
+  const { amount, category, userId = 1 } = req.body;
+
+  if (!amount || !category)
+    return res.status(400).json({ error: "amount and category required" });
+
+  const expenses = readDB("expenses");
+  const users = readDB("users");
+
+  expenses.push({
+    id: nextId(expenses),
+    userId,
+    category,
+    amount: Number(amount),
+    month: "June",
+    year: 2025
+  });
+
+  writeDB("expenses", expenses);
+
+  const user = users.find(u => u.id === userId);
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  user.balance -= Number(amount);
+  writeDB("users", users);
+
+  res.json({ success: true, newBalance: user.balance });
 });
 
 app.post("/api/auth/register", (req, res) => {
   const { name, email, password } = req.body;
-  if (!name || !email || !password) return res.status(400).json({ error: "All fields required" });
+
+  if (!name || !email || !password)
+    return res.status(400).json({ error: "All fields required" });
 
   const users = readDB("users");
-  if (users.find(u => u.email === email)) return res.status(409).json({ error: "Email already registered" });
 
-  const user = { id: nextId(users), name, email, password, balance: 0, creditScore: 0, monthlyBudget: 20000 };
+  if (users.find(u => u.email === email))
+    return res.status(409).json({ error: "Email already registered" });
+
+  const user = {
+    id: nextId(users),
+    name,
+    email,
+    password,
+    balance: 0,
+    creditScore: 0,
+    monthlyBudget: 20000
+  };
+
   users.push(user);
   writeDB("users", users);
+
   res.json({ success: true, userId: user.id });
 });
 
@@ -339,16 +385,24 @@ app.listen(PORT, () => {
 });
 
 
-let balance = 20500; // starting value
+// ============================================================
+//  AI CHATBOT ROUTE (FinBot)
+// ============================================================
 
-function updateBalance(amount, type) {
-    if (type === "income") {
-        balance += amount;
-    } else {
-        balance -= amount;
-    }
+app.post("/api/chat", async (req, res) => {
+  const { message } = req.body;
 
-    document.getElementById("balance").innerText = "₹" + balance;
-}
+  if (!message) {
+    return res.status(400).json({ error: "Message is required" });
+  }
 
-updateBalance(amount, "expense");
+  try {
+    // simple mock AI first (to test)
+    const reply = `🤖 You said: ${message}. I'm FinBot, your financial advisor.`;
+
+    res.json({ reply });
+
+  } catch (err) {
+    res.status(500).json({ error: "Chatbot error" });
+  }
+});

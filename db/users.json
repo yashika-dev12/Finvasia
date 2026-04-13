@@ -7,5 +7,14 @@
     "balance": 20500,
     "creditScore": 720,
     "monthlyBudget": 30000
+  },
+  {
+    "id": 2,
+    "name": "yashika",
+    "email": "sehgalyashika1@gmail.com",
+    "password": "Yashika@2007",
+    "balance": 0,
+    "creditScore": 0,
+    "monthlyBudget": 20000
   }
 ]
